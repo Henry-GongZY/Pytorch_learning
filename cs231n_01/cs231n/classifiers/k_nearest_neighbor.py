@@ -1,6 +1,8 @@
 from builtins import range
 from builtins import object
 import numpy as np
+import math
+from numpy.lib.nanfunctions import nancumprod
 from past.builtins import xrange
 
 
@@ -71,13 +73,22 @@ class KNearestNeighbor(object):
             for j in range(num_train):
                 #####################################################################
                 # TODO:                                                             #
-                # Compute the l2 distance between the ith test point and the jth    #
-                # training point, and store the result in dists[i, j]. You should   #
-                # not use a loop over dimension, nor use np.linalg.norm().          #
+                # Compute the l2 distance between the ith test point and the jth#
+                # training point, and store the result in dists[i, j]. You should#
+                # not use a loop over dimension, nor use np.linalg.norm().#
                 #####################################################################
                 # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-                pass
+                # 嵌套循环低效法（太慢了）
+                # count = X.shape[1]
+                # num = 0
+                # for k in range(count):
+                #    num += (X[i][k]-self.X_train[j][k]) ** 2
+
+                dists[i, j] = np.sqrt(np.sum((X[i, :] - self.X_train[j, :]) ** 2))
+
+                # linalg作弊法（稍微快点）
+                # dists[i][j] = np.linalg.norm(X[i] - self.X_train[j])
 
                 # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
         return dists
@@ -164,7 +175,14 @@ class KNearestNeighbor(object):
             #########################################################################
             # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-            pass
+            # 按行排序
+            arg = dists[i].argsort()
+            # 找出前k个
+            arg = arg[0:k]
+            # 找到其label分组
+            closest_y = self.y_train[arg]
+            # 转换成ndarray
+            closest_y = np.array(closest_y)
 
             # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
             #########################################################################
@@ -176,7 +194,8 @@ class KNearestNeighbor(object):
             #########################################################################
             # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-            pass
+            # 找到出现次数最多的label，并存储在对应的y_pred中
+            y_pred[i] = np.argmax(np.bincount(closest_y))
 
             # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
