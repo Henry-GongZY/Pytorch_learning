@@ -112,7 +112,14 @@ class KNearestNeighbor(object):
             #######################################################################
             # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-            pass
+            # 与训练数据的每一行进行相减,并取平方
+            tmp = (X[i, :] - self.X_train[:]) ** 2
+            # 5000行按行相加
+            tmp = np.sum(tmp, axis=1)
+            # 开方，列向量转行向量
+            tmp = np.sqrt(tmp).T
+            # 赋值
+            dists[i, :] = tmp
 
             # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
         return dists
@@ -142,7 +149,10 @@ class KNearestNeighbor(object):
         #########################################################################
         # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-        pass
+        dists += np.sum(X ** 2, axis=1, keepdims=True).reshape(num_test, 1)
+        dists += np.sum(self.X_train ** 2, axis=1, keepdims=True).reshape(1, num_train)
+        dists += -2 * (X @ self.X_train.T)
+        dists = np.sqrt(dists)
 
         # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
         return dists
